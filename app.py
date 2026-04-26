@@ -5,6 +5,51 @@ from question_generator import generate_assessment_questions
 from evaluator import evaluate_answers
 from learning_plan import generate_learning_plan
 
+st.markdown("""
+<style>
+
+/* Full App Background */
+.stApp {
+    background: linear-gradient(135deg, #050816, #0B1120);
+    color: white;
+}
+
+/* Main content area */
+section.main > div {
+    background: transparent;
+}
+
+/* Remove white blocks feeling */
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    background: transparent;
+}
+
+/* Input boxes */
+textarea, input {
+    background-color: rgba(255,255,255,0.05) !important;
+    color: white !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 12px !important;
+}
+
+/* File uploader */
+[data-testid="stFileUploader"] {
+    background: rgba(255,255,255,0.03);
+    padding: 10px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Labels */
+label {
+    color: white !important;
+    font-weight: 500;
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 def display_skills_as_tags(title, skills, color="#2563eb"):
     st.markdown(f"#### {title}")
@@ -48,26 +93,187 @@ st.set_page_config(
     layout="centered"
 )
 
-st.title("🚀 SkillSync AI")
+st.markdown("""
+<style>
+
+/* Main Hero Container */
+.hero-section {
+    background: linear-gradient(135deg, #050816, #0B1120);
+    padding: 40px;
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 0 30px rgba(59,130,246,0.12);
+    margin-bottom: 30px;
+}
+
+/* Logo Title */
+.hero-logo {
+    font-size: 38px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 25px;
+}
+
+.hero-logo span {
+    background: linear-gradient(90deg, #60a5fa, #8b5cf6, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Welcome Text */
+.hero-welcome {
+    font-size: 30px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 18px;
+}
+
+.hero-welcome span {
+    background: linear-gradient(90deg, #60a5fa, #8b5cf6, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Main Heading */
+.hero-heading {
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 35px;
+    line-height: 1.5;
+}
+
+/* Feature Rows */
+.feature-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.icon-box {
+    width: 45px;
+    height: 45px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-right: 20px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 0 12px rgba(59,130,246,0.15);
+}
+
+.feature-text {
+    font-size: 18px;
+    color: white;
+    font-weight: 500;
+    min-width: 500px;
+}
+
+.glow-line {
+    flex: 1;
+    height: 2px;
+    margin-left: 20px;
+    background: linear-gradient(90deg, rgba(59,130,246,0.3), rgba(139,92,246,0.8));
+    border-radius: 20px;
+    position: relative;
+}
+
+.glow-line::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: -4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #60a5fa;
+    box-shadow: 0 0 15px #60a5fa;
+}
+
+</style>
+
+<div class="hero-section">
+
+<div class="hero-logo">
+🚀 SkillSync <span>AI</span>
+</div>
+
+<div class="hero-welcome">
+Welcome <span>Future Achiever</span> 👋
+</div>
+
+<div class="hero-heading">
+I’m your Skill Assessment & Personalized Learning Plan Agent
+</div>
+
+<div class="feature-row">
+    <div class="icon-box">🔍</div>
+    <div class="feature-text">Understand your current skill level</div>
+    <div class="glow-line"></div>
+</div>
+
+<div class="feature-row">
+    <div class="icon-box">🎯</div>
+    <div class="feature-text">Compare your skills with job requirements</div>
+    <div class="glow-line"></div>
+</div>
+
+<div class="feature-row">
+    <div class="icon-box">📈</div>
+    <div class="feature-text">Identify missing and weak skills</div>
+    <div class="glow-line"></div>
+</div>
+
+<div class="feature-row">
+    <div class="icon-box">🧠</div>
+    <div class="feature-text">Assess real proficiency through smart questions</div>
+    <div class="glow-line"></div>
+</div>
+
+<div class="feature-row">
+    <div class="icon-box">🛠</div>
+    <div class="feature-text">Build your personalized learning roadmap</div>
+    <div class="glow-line"></div>
+</div>
+
+<div class="feature-row">
+    <div class="icon-box">📚</div>
+    <div class="feature-text">Recommend curated resources + time estimates</div>
+    <div class="glow-line"></div>
+</div>
+
+<div class="feature-row">
+    <div class="icon-box">🚀</div>
+    <div class="feature-text">Suggest adjacent skills for faster career growth</div>
+    <div class="glow-line"></div>
+</div>
+
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("""
-### Welcome Future Achiever 👋
+<br>
 
-#### I’m your Skill Assessment & Personalized Learning Plan Agent
+<hr style="
+    border: none;
+    height: 1px;
+    background: rgba(255,255,255,0.15);
+    margin-top: 20px;
+    margin-bottom: 20px;
+">
 
-🔍 Understand your current skill level  
-🎯 Compare your profile with job requirements  
-📈 Identify missing and weak skills  
-🧠 Assess real proficiency through smart questions  
-🛠 Build your personalized learning roadmap  
-📚 Recommend curated resources + time estimates  
-🚀 Suggest adjacent skills for faster career growth  
-
----
-
-#### Beyond Resume Matching — Real Skill Assessment Starts Here 🚀
-""")
-
+<div style="
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 30px;
+">
+    🚀 Beyond Resume Matching — Real Skill Assessment Starts Here
+</div>
+""", unsafe_allow_html=True)
 # =====================================
 # Job Description Section
 # =====================================

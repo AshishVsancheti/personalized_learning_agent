@@ -203,31 +203,31 @@ streamlit run app.py
 
 ### Home Page
 
-![Home Page](scrrenshots/homepage.png)
+![Home Page](screenshots/home_page.png)
 
 ---
 
 ### Skill Matching Result
 
-![Skill Matching Result](scrrenshots/skll_match.png)
+![Skill Matching Result](screenshots/skill_match.png)
 
 ---
 
 ### Question Generation
 
-![Question Generation](scrrenshots/assesment_question.png)
+![Question Generation](screenshots/assesment_question.png)
 
 ---
 
 ### Skill Proficiency Evaluation
 
-![Skill Proficiency Evaluation](scrrenshots/skill_proficiency_ evaluation.png)
+![Skill Proficiency Evaluation](screenshots/skill_proficiency_evaluation.png)
 
 ---
 
 ### Personalized Learning Plan
 
-![Personalized Learning Plan](scrrenshots/personalized_learning_plan.png)
+![Personalized Learning Plan](screenshots/personalized_learning_plan.png)
 
 ---
 
