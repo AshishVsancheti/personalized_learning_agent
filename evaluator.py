@@ -1,3 +1,7 @@
+# =====================================
+# Import Required Libraries
+# =====================================
+
 from groq import Groq
 import os
 from dotenv import load_dotenv
@@ -5,13 +9,21 @@ import PyPDF2
 from docx import Document
 import json
 
+# Load Environment Variables
 load_dotenv()
 
+# Create Groq Client Using API Key
 client = Groq(
     api_key=os.getenv("GROQ_API_KEY")
 )
 
+# =====================================
+# Function: Evaluate Candidate Answers
+# =====================================
+
 def evaluate_answers(questions_with_answers, experience_level):
+
+    # Prompt for AI Evaluation
     prompt = f"""
     Return ONLY valid JSON.
 
@@ -58,6 +70,7 @@ def evaluate_answers(questions_with_answers, experience_level):
         ]
     }}
     """
+    # Call Groq API
     try:
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
@@ -70,17 +83,21 @@ def evaluate_answers(questions_with_answers, experience_level):
             temperature=0
         )
 
+        # Get raw response
         result = response.choices[0].message.content.strip()
 
     except Exception as e:
         print("Evaluation Error:", e)
         return []
 
+    # Clean Response
+    # Remove markdown wrappers like ```json
     result = result.replace("```json", "")
     result = result.replace("```python", "")
     result = result.replace("```", "")
     result = result.strip()
 
+    # Keep Only JSON Part
     start_index = result.find("{")
     end_index = result.rfind("}") + 1
 
@@ -89,6 +106,7 @@ def evaluate_answers(questions_with_answers, experience_level):
 
     print("Evaluation Result:", result)
 
+    # Convert JSON String → Python Dictionary
     try:
         evaluation_dict = json.loads(result)
     except:
@@ -96,4 +114,5 @@ def evaluate_answers(questions_with_answers, experience_level):
             "evaluations": []
         }
 
+    # Return Final Evaluation List
     return evaluation_dict["evaluations"]

@@ -1,9 +1,14 @@
 import streamlit as st
 import pandas as pd
+# Import custom project functions
 from agent import (match_skills,extract_text_from_file)
 from question_generator import generate_assessment_questions
 from evaluator import evaluate_answers
 from learning_plan import generate_learning_plan
+
+# =====================================
+# Global UI Styling (Dark Theme + Custom Design)
+# =====================================
 
 st.markdown("""
 <style>
@@ -51,22 +56,21 @@ label {
 </style>
 """, unsafe_allow_html=True)
 
+# =====================================
+# Reusable Function → Display Skills as Colored Tags
+# =====================================
+
 def display_skills_as_tags(title, skills, color="#2563eb"):
     st.markdown(f"#### {title}")
 
     if skills:
         tags_html = """
-<div style="
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-">
+<div style='display: flex; flex-wrap: wrap; gap: 10px; align-items: center;'>
 """
 
         for skill in skills:
             tags_html += f"""
-<div style="
+<div style='
     background-color: {color};
     color: white;
     padding: 8px 16px;
@@ -75,7 +79,7 @@ def display_skills_as_tags(title, skills, color="#2563eb"):
     font-weight: 500;
     white-space: nowrap;
     display: inline-block;
-">
+'>
     {skill}
 </div>
 """
@@ -87,11 +91,19 @@ def display_skills_as_tags(title, skills, color="#2563eb"):
     else:
         st.write("No skills found")
 
+# =====================================
+# Page Configuration
+# =====================================
+
 st.set_page_config(
     page_title="SkillSync AI",
     page_icon="🚀",
     layout="centered"
 )
+
+# =====================================
+# Main Home Page Details
+# =====================================
 
 st.markdown("""
 <style>
@@ -274,14 +286,16 @@ st.markdown("""
     🚀 Beyond Resume Matching — Real Skill Assessment Starts Here
 </div>
 """, unsafe_allow_html=True)
+
 # =====================================
-# Job Description Section
+# Job Description---> Input Section
 # =====================================
 
 st.markdown("##### 📄 Job Description")
 
 col1, col2 = st.columns([2, 3])
 
+# Left side → File Upload
 with col1:
     jd_file = st.file_uploader(
         "Upload File",
@@ -289,6 +303,7 @@ with col1:
         key="jd_upload"
     )
 
+# Right side → Manual Text Paste
 with col2:
     jd_text = st.text_area(
         "Paste JD Here",
@@ -299,7 +314,7 @@ with col2:
 st.divider()
 
 # =====================================
-# Resume Section
+# Resume---> Input Section
 # =====================================
 
 st.markdown("##### 📄 Candidate Resume")
@@ -326,6 +341,7 @@ st.divider()
 # Session State Initialization
 # =====================================
 
+## Used so that data remains visible after reruns
 if "results" not in st.session_state:
     st.session_state.results = None
 
@@ -336,10 +352,11 @@ if "questions" not in st.session_state:
     st.session_state.questions = []
 
 # =====================================
-# Evaluate Button
+# Main Button → Start Skill Evaluation
 # =====================================
 
 if st.button("🚀 Evaluate My Skills"):
+    # Validate both JD and Resume are provided
     if (jd_file or jd_text) and (resume_file or resume_text):
 
         # Job Description Text
@@ -358,28 +375,26 @@ if st.button("🚀 Evaluate My Skills"):
         else:
             final_resume_text = ""
 
+        # Run AI skill matching
         with st.spinner("Analyzing skills using AI..."):
-
             results = match_skills(final_jd_text, final_resume_text)
 
+            # If extraction fails
             if not results["jd_skills"] or not results["resume_skills"]:
-                st.warning(
-                    "⚠ No meaningful skills found. Please upload a better Resume or Job Description."
-                )
+                st.warning("⚠ No meaningful skills found. Please upload a better Resume or Job Description.")
                 st.stop()
-            # Save results
+
+            # Save results for future reruns
             st.session_state.results = results
 
-            # Reset old questions when new evaluation happens
+            # Reset old questions when new evaluation starts
             st.session_state.questions = []
 
     else:
-        st.warning(
-            "⚠ Please upload or paste both Job Description and Resume first."
-        )
+        st.warning("⚠ Please upload or paste both Job Description and Resume first.")
 
 # =====================================
-# Show Results After Button Click
+# Show matching skills results after button click
 # =====================================
 
 if st.session_state.results:
@@ -388,21 +403,15 @@ if st.session_state.results:
 
     st.success("✅ Skill extraction completed successfully!")
 
+    # Display extracted skills
     display_skills_as_tags(
-        "📌 Skills in Job Description",
-        results["jd_skills"],"#2563eb")
-
+        "📌 Skills in Job Description", results["jd_skills"],"#2563eb")
     display_skills_as_tags(
-        "📌 Skills in Resume",
-        results["resume_skills"],"#7c3aed")
-
+        "📌 Skills in Resume", results["resume_skills"],"#7c3aed")
     display_skills_as_tags(
-        "✅ Matched Skills",
-        results["matched_skills"],"#16a34a")
-
+        "✅ Matched Skills", results["matched_skills"],"#16a34a")
     display_skills_as_tags(
-        "⚠ Missing Skills",
-        results["missing_skills"],"#dc2626")
+        "⚠ Missing Skills", results["missing_skills"],"#dc2626")
 
     st.divider()
 
@@ -423,16 +432,15 @@ if st.session_state.results:
         key="experience_level"
     )
 
+    # Continue only after selecting experience level
     if experience_level != "Select Experience Level":
 
         st.success(
-            f"✅ Thank you! Your selected experience level is: {experience_level}"
-        )
+            f"✅ Thank you! Your selected experience level is: {experience_level}")
 
         # Generate questions only once
         if not st.session_state.questions:
             with st.spinner("Generating personalized interview questions..."):
-
                 st.session_state.questions = generate_assessment_questions(
                     results["matched_skills"],
                     experience_level
@@ -441,21 +449,27 @@ if st.session_state.results:
         st.divider()
         st.markdown("#### 🧠 AI Generated Skill Assessment Questions")
 
+        # =====================================
+        # Display Questions + Collect Answers
+        # =====================================
         if st.session_state.questions:
 
             user_answers = []
 
+            # Loop through all generated questions
             for index, item in enumerate(st.session_state.questions, 1):
-                st.markdown(
-                    f"**Q{index}. ({item['skill']})** {item['question']}"
-                )
 
+                # Show Question
+                st.markdown(
+                    f"**Q{index}. ({item['skill']})** {item['question']}")
+
+                # User answer input box
                 answer = st.text_area(
                     "",
                     placeholder="Your Answer Here",
-                    key=f"answer_{index}"
-                )
+                    key=f"answer_{index}")
 
+                # Save answer in list
                 user_answers.append({
                     "skill": item["skill"],
                     "question": item["question"],
@@ -464,20 +478,23 @@ if st.session_state.results:
 
             st.divider()
 
+            # =====================================
+            # Submit Answers for Evaluation
+            # =====================================
+
             if st.button("🚀 Submit Answers for Evaluation"):
 
-                # Check if all answers are provided
+                # Check if all answers are filled
                 all_answered = all(
                     answer["answer"].strip() != ""
-                    for answer in user_answers
-                )
+                    for answer in user_answers)
 
                 if not all_answered:
                     st.warning(
-                        "⚠ Please answer all questions before submitting for evaluation."
-                    )
+                        "⚠ Please answer all questions before submitting for evaluation.")
 
                 else:
+                    # Run AI answer evaluation
                     with st.spinner("Evaluating your answers using AI..."):
 
                         evaluation_results = evaluate_answers(
@@ -488,31 +505,41 @@ if st.session_state.results:
                     st.markdown("#### 📊 Skill Proficiency Evaluation")
 
                     # =====================================
-                    # Assessment Summary Card
+                    # Assessment Summary Calculation
                     # =====================================
 
                     total_score = 0
                     total_skills = len(evaluation_results)
                     missing_skills_count = len(results["missing_skills"])
 
+                    # Calculate total score
                     for item in evaluation_results:
                         total_score += item["score"]
 
+                    # Average score
                     overall_score = int(total_score / total_skills) if total_skills > 0 else 0
                     matched_skills_count = len(results["matched_skills"])
                     total_jd_skills = len(results["jd_skills"])
 
+                    # Skill match percentage
                     match_percentage = int(
                         (matched_skills_count / total_jd_skills) * 100
                         ) if total_jd_skills > 0 else 0
 
+                    # =====================================
                     # Interview Readiness Logic
+                    # =====================================
+
                     if overall_score >= 80 and match_percentage >= 80:
                         readiness = "🟢 Strong Candidate"
                     elif overall_score >= 60 and match_percentage >= 60:
                         readiness = "🟡 Promising Candidate"
                     else:
                         readiness = "🔴 Needs Improvement"
+
+                    # =====================================
+                    # Assessment Summary UI
+                    # =====================================
 
                     st.divider()
                     st.markdown("##### 📈 Assessment Summary")
@@ -539,12 +566,16 @@ if st.session_state.results:
 
                     st.divider()
 
+                    # =====================================
+                    # Skill-wise Detailed Feedback
+                    # =====================================
+
                     if evaluation_results:
 
                         for item in evaluation_results:
                             score = item["score"]
                             
-                            #status Logic
+                            # Skill strength status logic
                             if score >= 80:
                                 status = "🟢 Strong"
                             elif score >= 60:
@@ -555,9 +586,10 @@ if st.session_state.results:
                             st.markdown(f"#### {item['skill']}")
                             st.markdown(f"##### {status} | Score: {score}/100")
 
-                            # Progress Bar
+                            # Progress bar for score
                             st.progress(score)
 
+                            # Expandable detailed feedback
                             with st.expander(f"View Detailed Feedback for {item['skill']}"):
                                 st.markdown(f"**Feedback:** {item['feedback']}")
                                 st.markdown(f"**Improvement Suggestion:** {item['suggestion']}")
@@ -565,6 +597,11 @@ if st.session_state.results:
                             st.markdown("---")
 
                         st.divider()
+
+                        # =====================================
+                        # Personalized Learning Plan
+                        # =====================================
+
                         st.markdown("#### 📚 Personalized Learning Plan")
 
                         learning_plan_result = generate_learning_plan(
@@ -574,6 +611,7 @@ if st.session_state.results:
                             experience_level
                         )
 
+                        # Show learning plan
                         if learning_plan_result["learning_plan"]:
 
                             for plan in learning_plan_result["learning_plan"]:
@@ -591,7 +629,11 @@ if st.session_state.results:
                                     st.write(", ".join(plan["resources"]))
 
                                 st.markdown("---")
-                                
+                        
+                        # =====================================
+                        # Adjacent Skills Recommendation
+                        # =====================================
+
                         if learning_plan_result["adjacent_skills"]:
 
                             display_skills_as_tags(

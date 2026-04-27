@@ -1,3 +1,7 @@
+# =====================================
+# Import Required Libraries
+# =====================================
+
 from groq import Groq
 import os
 from dotenv import load_dotenv
@@ -5,14 +9,21 @@ import PyPDF2
 from docx import Document
 import json
 
+# Load Environment Variables
 load_dotenv()
 
+# Create Groq Client
 client = Groq(
     api_key=os.getenv("GROQ_API_KEY")
 )
 
+# =====================================
+# Function: Generate Personalized Learning Plan
+# =====================================
+
 def generate_learning_plan(missing_skills,evaluation_results,matched_skills,experience_level):
     
+    # Prompt for AI Learning Plan Generation
     prompt = f"""
     Return ONLY valid JSON.
 
@@ -140,6 +151,7 @@ def generate_learning_plan(missing_skills,evaluation_results,matched_skills,expe
             ]
     }}
     """
+    # Call Groq API
     try:
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
@@ -152,6 +164,7 @@ def generate_learning_plan(missing_skills,evaluation_results,matched_skills,expe
             temperature=0.3
         )
 
+        # Raw response from model
         result = response.choices[0].message.content.strip()
 
     except Exception as e:
@@ -161,11 +174,14 @@ def generate_learning_plan(missing_skills,evaluation_results,matched_skills,expe
         "adjacent_skills": []
     }
 
+    # Clean Response
+    # Remove markdown wrappers like ```json
     result = result.replace("```json", "")
     result = result.replace("```python", "")
     result = result.replace("```", "")
     result = result.strip()
 
+    # Keep Only JSON Part
     start_index = result.find("{")
     end_index = result.rfind("}") + 1
 
@@ -174,6 +190,7 @@ def generate_learning_plan(missing_skills,evaluation_results,matched_skills,expe
 
     print("Learning Plan Result:", result)
 
+    # Convert JSON String → Python Dictionary
     try:
         learning_plan_dict = json.loads(result)
     except:
@@ -182,4 +199,5 @@ def generate_learning_plan(missing_skills,evaluation_results,matched_skills,expe
             "adjacent_skills": []
         }
 
+    # Return Final Learning Plan
     return learning_plan_dict

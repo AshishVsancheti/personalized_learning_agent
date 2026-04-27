@@ -1,17 +1,29 @@
-from groq import Groq  # library to connect with Groq LLM API
-import os   # for accessing environment variables
-from dotenv import load_dotenv   # to load variables from .env file
-import PyPDF2   # for reading PDF files
-from docx import Document  #for reading DOCX files
+# =====================================
+# Import Required Libraries
+# =====================================
+
+from groq import Groq  
+import os   
+from dotenv import load_dotenv   
+import PyPDF2   
+from docx import Document 
 import json
 
+# Load Environment Variables
 load_dotenv()
 
+# Create Groq Client
 client = Groq(
     api_key=os.getenv("GROQ_API_KEY")
 )
 
+# =====================================
+# Function: Generate Assessment Questions
+# =====================================
+
 def generate_assessment_questions(matched_skills, experience_level):
+
+    # Prompt for AI Question Generation
     prompt = f"""
     Return ONLY valid JSON.
 
@@ -83,6 +95,7 @@ def generate_assessment_questions(matched_skills, experience_level):
         ]
     }}
     """
+    # Call Groq API
     try:
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
@@ -95,17 +108,21 @@ def generate_assessment_questions(matched_skills, experience_level):
             temperature=0.7
         )
 
+        # Raw response from model
         result = response.choices[0].message.content.strip()
 
     except Exception as e:
         print("Question Generation Error:", e)
         return []
     
+    # Clean Response
+    # Remove markdown wrappers like ```json
     result = result.replace("```json", "")
     result = result.replace("```python", "")
     result = result.replace("```", "")
     result = result.strip()
 
+    # Keep Only JSON Part
     start_index = result.find("{")
     end_index = result.rfind("}") + 1
 
@@ -114,6 +131,7 @@ def generate_assessment_questions(matched_skills, experience_level):
 
     print("Generated Questions:", result)
 
+    # Convert JSON String → Python Dictionary
     try:
         questions_dict = json.loads(result)
     except:
@@ -121,4 +139,5 @@ def generate_assessment_questions(matched_skills, experience_level):
             "questions": []
         }
 
+    # Return Final Questions List
     return questions_dict["questions"]
